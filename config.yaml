@@ -1,0 +1,101 @@
+# config.yaml — Pairs Trading Strategy Configuration
+# All tunable parameters in one place. Edit here instead of in source files.
+
+# ---------------------------------------------------------------------------
+# Data
+# ---------------------------------------------------------------------------
+data:
+  raw_prices_path: "~/Downloads/russel3000PriceDaily.csv"
+  raw_ratios_path: "~/Downloads/financial_ratios.csv"
+  testing_data_path: "tetsing_data.csv"   # intentional typo preserved from source
+  parsed_data_dir: "data/"
+  training_start: "2010-01-01"
+  training_end:   "2015-12-31"
+  testing_start:  "2016-01-01"
+  testing_end:    "2019-12-31"
+
+# ---------------------------------------------------------------------------
+# Feature Engineering / PCA
+# ---------------------------------------------------------------------------
+pca:
+  price_components: 15   # captures >99% variance in price PCA
+  ratio_components: 5    # captures >99% variance in ratio PCA
+
+# ---------------------------------------------------------------------------
+# Clustering
+# ---------------------------------------------------------------------------
+clustering:
+  kmeans:
+    n_clusters: 31
+    random_state: 42
+  dbscan:
+    eps: 1.8
+    min_samples: 3
+
+# ---------------------------------------------------------------------------
+# Pair Selection
+# ---------------------------------------------------------------------------
+pair_selection:
+  adf_significance: 0.05          # p-value threshold for ADF / Engle-Granger test
+  hurst_threshold: 0.5            # reject pairs with Hurst exponent >= this value
+  max_half_life_days: 60          # reject pairs whose mean-reversion half-life exceeds this
+  min_half_life_days: 1           # reject pairs that mean-revert too fast (noise)
+  retest_frequency_days: 63       # re-test cointegration every ~quarter during backtest
+  pairs_per_cluster: 1            # minimum pairs to select per cluster
+
+# Active pairs (CRSP PERMNO identifiers, ordered A/B)
+active_pairs:
+  - ["43350", "82651"]
+  - ["44644", "90458"]
+  - ["24969", "24985"]
+  - ["42585", "83621"]
+  - ["60186", "81095"]
+  - ["16548", "81577"]
+
+# ---------------------------------------------------------------------------
+# Linear Regression Trading Strategy
+# ---------------------------------------------------------------------------
+linear_strategy:
+  training_window_days: 700       # rolling window length for model fitting
+  retrain_frequency_days: 30      # how often to refit the model
+  poly_max_degree: 4              # maximum polynomial degree to consider
+  poly_min_degree: 1
+  lasso_cv_folds: 5               # LassoCV cross-validation folds
+  entry_z: 2.0                    # |z-score| to enter a trade
+  exit_z: 0.5                     # |z-score| to exit (mean reversion)
+  stop_loss_z: 4.0                # |z-score| hard stop-loss
+  max_holding_days: 30            # maximum days to hold a position before forced exit
+  commission_bps: 5               # one-way commission in basis points (0 = old behaviour)
+  initial_capital: 1_000_000
+
+# ---------------------------------------------------------------------------
+# Kalman Filter Trading Strategy
+# ---------------------------------------------------------------------------
+kalman_strategy:
+  delta: 1.0e-4                   # state transition noise scaling (controls how fast theta adapts)
+  vt: 1.0e-3                      # observation noise variance
+  entry_factor: 1.5               # factorA: enter when |et| > entry_factor * sqrt(Qt)
+  exit_factor: 1.1                # factorC: exit  when |et| < exit_factor * sqrt(Qt)
+  stop_loss_factor: 4.0           # hard stop when |et| > stop_loss_factor * sqrt(Qt)
+  max_holding_days: 30            # maximum days to hold a position before forced exit
+  use_dynamic_hedge_ratio: true   # use theta[0] from Kalman state for hedge sizing
+  commission_bps: 5               # one-way commission in basis points
+  initial_capital: 1_000_000
+
+# ---------------------------------------------------------------------------
+# Backtesting
+# ---------------------------------------------------------------------------
+backtest:
+  initial_capital: 1_000_000
+  commission_bps: 5               # one-way commission per trade leg (in basis points)
+  slippage_bps: 2                 # market-impact slippage estimate per trade
+  borrow_cost_annual_pct: 0.5     # stock-borrow fee for short legs (annualized %)
+  rebalance_frequency_days: 30    # how often to rebalance pair allocations to equal weight
+
+# ---------------------------------------------------------------------------
+# Performance Metrics
+# ---------------------------------------------------------------------------
+metrics:
+  annualization_factor: 252       # trading days per year
+  risk_free_rate_series: "SVENY01"  # 1-year Treasury yield series identifier
+  rolling_window_days: 63         # window for rolling Sharpe / volatility (~quarter)

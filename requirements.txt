@@ -1,0 +1,46 @@
+# requirements.txt — Pairs Trading project
+# Pin versions that were known-good at time of writing (March 2026).
+# Install with:
+#   python -m venv .venv
+#   source .venv/bin/activate
+#   pip install -r requirements.txt
+
+# ── Core scientific stack ─────────────────────────────────────────────────
+numpy>=1.24,<2.0
+pandas>=2.0,<3.0
+scipy>=1.11,<2.0
+
+# ── Machine learning ──────────────────────────────────────────────────────
+scikit-learn>=1.3,<2.0
+
+# ── Time-series / econometrics ────────────────────────────────────────────
+statsmodels>=0.14,<1.0
+
+# ── Visualisation ─────────────────────────────────────────────────────────
+matplotlib>=3.7,<4.0
+seaborn>=0.13,<1.0
+
+# ── Clustering evaluation ─────────────────────────────────────────────────
+yellowbrick>=1.5,<2.0
+
+# ── Financial performance metrics ─────────────────────────────────────────
+empyrical>=0.5.5,<1.0
+
+# ── Missing-data visualisation ────────────────────────────────────────────
+missingno>=0.5,<1.0
+
+# ── Event-driven backtesting (Kalman strategy) ────────────────────────────
+# qstrader does not publish versioned releases to PyPI; install from source:
+#   pip install git+https://github.com/mhallsmoore/qstrader.git
+# Uncomment the line below if you have a local clone:
+# qstrader @ file:///path/to/qstrader
+
+# ── Notebook tooling ──────────────────────────────────────────────────────
+jupyter>=1.0,<2.0
+nbstripout>=0.7,<1.0    # strips notebook output before git commits
+
+# ── Config loading ────────────────────────────────────────────────────────
+PyYAML>=6.0,<7.0
+
+# ── CLI ───────────────────────────────────────────────────────────────────
+click>=8.1,<9.0
